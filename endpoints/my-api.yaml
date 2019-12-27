@@ -8,7 +8,7 @@ host: "my-api.endpoints.geodis-usapp.cloud.goog"
 # DNS config
 x-google-endpoints:
 - name: "my-api.endpoints.geodis-usapp.cloud.goog"
-  target: "34.95.110.63"
+  target: "34.102.158.67"
 consumes:
 - "application/json"
 produces:

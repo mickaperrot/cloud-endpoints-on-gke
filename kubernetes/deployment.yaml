@@ -31,12 +31,12 @@ spec:
           "--backend", "127.0.0.1:8080",
           "--service", "my-api.endpoints.geodis-usapp.cloud.goog",
           "--rollout_strategy", "managed",
-          #"--healthz", " "
+          "--healthz", " "
         ]
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
         ports:
           - containerPort: 8081
       - name: service1-pod

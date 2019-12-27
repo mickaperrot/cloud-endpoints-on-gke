@@ -20,7 +20,7 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 8081
   selector:
     app: service1-pod
   type: NodePort
@@ -33,7 +33,7 @@ spec:
   ports:
   - port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 8081
   selector:
     app: service2-pod
   type: NodePort
