@@ -1,3 +1,156 @@
+# Basic Cloud Endpoints on GKE test
+
+## Deploy the API definition
+
+Deploy the OpenAPI definition:
+
+```
+gcloud endpoints services deploy endpoints/my-api.yaml 
+```
+
+## Build the container images
+
+Move to the service 1 docker image:
+
+```
+cd docker/service1
+```
+
+Build the container image:
+
+```
+docker build -t [IMAGE-NAME] .
+```
+
+Tag the image:
+
+```
+docker tag [IMAGE-NAME] gcr.io/[PROJECT-ID]/[IMAGE-NAME]
+```
+
+Push the image:
+
+```
+docker push gcr.io/[PROJECT-ID]/[IMAGE-NAME]
+```
+
+Run the same steps again for service 2.
+
+## Deploy the k8s backend
+
+Create the cluster:
+
+```
+gcloud container clusters create [CLUSTER-NAME] --zone [ZONE]
+```
+
+Get the cluster's credentials:
+
+```
+gcloud container clusters get-credentials [CLUSTER-NAME] --zone [ZONE]
+```
+
+Edit the deployment configuration:
+1. Replace service with the endpoint service name.
+1. Replace images with the docker image create in the previous step.
+
+Deploy the deployment configuration:
+
+```
+kubectl apply -f kubernetes/deployment.yaml
+```
+
+Deploy the service configuration:
+
+```
+kubectl apply -f kubernetes/service.yaml
+```
+
+Create a static IP address:
+
+```
+gcloud compute addresses create [IP-ADDRESS-NAME] --global
+```
+
+Get the created IP address:
+
+```
+gcloud compute addresses describe [IP-ADDRESS-NAME] --global
+```
+
+Replace the domain with the endpoint domain in the certificate configuration.
+
+Deploy the certificate:
+
+```
+kubectl apply-f kubernetes/certificate.yaml
+```
+
+Verify the certificate is deployed:
+
+```
+kubectl describe managedcertificate
+```
+
+Edit the ingress configuration with the static IP and certificate.
+
+Deploy the ingress:
+
+```
+kubectl apply kubernetes/ingress.yaml
+```
+
+Get the ingress IP address:
+
+```
+kubectl get ingress
+```
+
+## Test the endpoint
+
+Try calling the endpoint:
+
+```
+curl "https://[INGRESS-IP]/service1"
+```
+
+## Configure the DNS name
+
+Edit my-api.yaml.
+
+Configure the x-google-endpoints section with the endpoint service name and the ingress IP address.
+
+Deploy the endpoint configuration:
+
+```
+gcloud endpoints services deploy my-api.yaml
+```
+
+Call the API using the DNS name:
+
+```
+curl "http://[DNS-NAME]/service1"
+```
+
+# Troubleshooting
+Start an ephemeral container running inside the cluster:
+
+ ```
+ kubectl run -it --rm --restart=Never alpine --image=alpine
+ ```
+
+ Once inside the cluster install Curl:
+
+ ```
+ apk add curl
+ ```
+ 
+ Start a shell in a running pod:
+ 
+ ```
+ kubectl exec -it [POD] -c [CONTAINER] -- /bin/sh
+ ```
+
 # Google Cloud Endpoints sample with Firebase Auth on GKE
 
 This sample demonstrates how to use Google Cloud Endpoints with Firebase authentication and GKE backend.
@@ -30,17 +183,23 @@ To deploy the sample app to production:
 
 ## Configure the Endpoint API
 
-Edit openapi.yaml.
+Edit auth/openapi.yaml.
 
 Configure the host with unique name and configure the project ID.
 
 Deploy the API:
 
 ```
-gcloud endpoints services deploy openapi.yaml
+gcloud endpoints services deploy auth/openapi.yaml
 ```
 
 ## Build the container image
+
+Move to the docker folder:
+
+```
+cd auth/docker
+```
 
 Build the container image:
 
@@ -77,7 +236,7 @@ Edit endpoints.yaml:
 Deploy the configuration:
 
 ```
-kubectl apply -f deployment.yaml
+kubectl apply -f <<TO BE DEFINED>>
 ```
 
 Get the external IP address:
@@ -117,184 +276,4 @@ gcloud endpoints services deploy openapi.yaml
 Call the API using the DNS name:
 
 ```
-curl --request GET "http://DNS_NAME:80/headers?access_token=TOKEN"
-```
-
-# Basic Cloud Endpoints on GKE test
-
-## Deploy the API definition
-
-Deploy the OpenAPI definition:
-
-```
-gcloud endpoints services deploy my-api.yaml 
-```
-
-## Build the container image
-
-Build the container image:
-
-```
-docker build -t [IMAGE-NAME] .
-```
-
-Tag the image:
-
-```
-docker tag [IMAGE-NAME] gcr.io/[PROJECT-ID]/[IMAGE-NAME]
-```
-
-Push the image:
-
-```
-docker push gcr.io/[PROJECT-ID]/[IMAGE-NAME]
-```
-
-## Deploy the k8s backend
-
-Create the cluster:
-
-```
-gcloud container clusters create [CLUSTER-NAME] --zone [ZONE]
-```
-
-Get the cluster's credentials:
-
-```
-gcloud container clusters get-credentials [CLUSTER-NAME] --zone [ZONE]
-```
-
-Create a static IP address:
-
-```
-gcloud compute addresses create [IP-ADDRESS-NAME] --global
-```
-
-Get the created IP address:
-
-```
-gcloud compute addresses describe [IP-ADDRESS-NAME] --global
-```
-
-Edit api-credentials.yaml:
-1. Replace service with the endpoint service name.
-1. Replace image with the docker image create in the previous step.
-1. Set the IP address just created
-
-Deploy the configuration:
-
-```
-kubectl apply -f api-credentials.yaml
-```
-
-Get the external IP address:
-
-```
-kubectl get ingress
-```
-
-## Test the endpoint
-
-Try calling the endpoint:
-
-```
-curl --request POST \
-   --header "content-type:application/json" \
-   --data '{"message":"hello world"}' \
-   "http://[INGRESS-IP]:80/echo"
-```
-
-## Configure the DNS name
-
-Edit my-api.yaml.
-
-Configure the x-google-endpoints section with the endpoint service name and the ingress IP address.
-
-Deploy the endpoint configuration:
-
-```
-gcloud endpoints services deploy my-api.yaml
-```
-
-Call the API using the DNS name:
-
-```
-curl --request POST \
-   --header "content-type:application/json" \
-   --data '{"message":"hello world"}' \
-   "http://[DNS-NAME]:80/echo"
-```
-
-Verify the certificate is deployed:
-
-```
-kubectl describe managedcertificate
-```
-
-# Troubleshooting
-Start a container running inside the cluster:
- ```
- kubectl run -it --rm --restart=Never alpine --image=alpine
- ```
- Once inside the cluster install Curl:
- ```
- apk add curl
- ```
- 
- Start a shell from a running pod:
- 
- ```
- kubectl exec -it [POD] -c [CONTAINER] -- /bin/sh
- ```
-
- ## Build the image for service 1
-
- Move to service 1 directory:
- 
- ```
- cd ./docker/service1
- ```
-
- Build the image:
-
- ```
- docker build -t service1 .
- ```
-
- Tag the image:
- 
- ```
- docker tag service1 gcr.io/[PROJECT-ID]/service1
- ```
- 
- Push the image:
- 
- ```
- docker push gcr.io/[PROJECT-ID]/service1
- ```
-
-## Build the image for service 2
-
- Move to service 2 directory:
- 
- ```
- cd ./docker/service2
- ```
-
- Build the image:
-
- ```
- docker build -t service2 .
- ```
-
- Tag the image:
- 
- ```
- docker tag service2 gcr.io/[PROJECT-ID]/service2
- ```
- 
- Push the image:
- 
- ```
- docker push gcr.io/[PROJECT-ID]/service2
- ```
+curl --request GET "http://DNS_NAME:80/headers?access_token=TOKEN"s
