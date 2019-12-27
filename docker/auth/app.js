@@ -26,6 +26,19 @@ app.set('case sensitive routing', true);
 app.use(bodyParser.json());
 // [END setup]
 
+app.get('/', (req, res) => {
+  res
+    .status(200)
+    .json({message: 'Hello world!'})
+    .end();
+});
+
+app.get('/health', (req, res) => {
+  res
+    .status(200)
+    .end();
+});
+
 app.post('/echo', (req, res) => {
   res
     .status(200)

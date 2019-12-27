@@ -26,33 +26,3 @@ spec:
   selector:
     app: return-headers
   type: LoadBalancer
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: return-headers
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: return-headers
-    spec:
-      containers:
-      # [START esp]
-      - name: esp
-        image: gcr.io/endpoints-release/endpoints-runtime:1
-        args: [
-          "--http_port", "8081",
-          "--backend", "127.0.0.1:8080",
-          "--service", "echo-api.endpoints.geodis-usapp.cloud.goog",
-          "--rollout_strategy", "managed",
-        ]
-      # [END esp]
-        ports:
-          - containerPort: 8081
-      - name: return-headers
-        # image: gcr.io/google-samples/echo-node:1.0
-        image: gcr.io/geodis-usapp/my-image
-        ports:
-          - containerPort: 8080
