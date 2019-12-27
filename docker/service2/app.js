@@ -24,11 +24,11 @@ const app = express();
 app.set('case sensitive routing', true);
 // [END setup]
 
-app.get('/', (req, res) => {
-  res
-    .status(200)
-    .end();
-});
+// app.get('/', (req, res) => {
+//   res
+//     .status(200)
+//     .end();
+// });
 
 app.get('/service2', (req, res) => {
   res
@@ -37,11 +37,11 @@ app.get('/service2', (req, res) => {
     .end();
 });
 
-app.get('/health', (req, res) => {
-  res
-    .status(200)
-    .end();
-});
+// app.get('/health', (req, res) => {
+//   res
+//     .status(200)
+//     .end();
+// });
 
 if (module === require.main) {
   // [START listen]
