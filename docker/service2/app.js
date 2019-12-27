@@ -22,13 +22,6 @@ const express = require('express');
 const app = express();
 
 app.set('case sensitive routing', true);
-// [END setup]
-
-// app.get('/', (req, res) => {
-//   res
-//     .status(200)
-//     .end();
-// });
 
 app.get('/service2', (req, res) => {
   res
@@ -37,11 +30,13 @@ app.get('/service2', (req, res) => {
     .end();
 });
 
-// app.get('/health', (req, res) => {
-//   res
-//     .status(200)
-//     .end();
-// });
+// Run health checks on the container instead of the ESP
+// Not required if using ESP health check instead
+app.get('/health', (req, res) => {
+  res
+    .status(200)
+    .end();
+});
 
 if (module === require.main) {
   // [START listen]

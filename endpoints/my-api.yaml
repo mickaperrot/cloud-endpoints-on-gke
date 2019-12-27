@@ -18,13 +18,8 @@ schemes:
 #- "https"
 - "http"
 paths:
-  "/":
-    get:
-      description: "Health check"
-      operationId: "healthCheck"
-      responses:
-        200:
-          description: "Health OK"
+  # Run health check on the backend container instead of the ESP
+  # Not required when running health check on ESP
   "/health":
     get:
       description: "Health check"

@@ -31,7 +31,7 @@ spec:
           "--backend", "127.0.0.1:8080",
           "--service", "my-api.endpoints.geodis-usapp.cloud.goog",
           "--rollout_strategy", "managed",
-          "--healthz", "health"
+          #"--healthz", "health" # Uncomment if using ESP health check
         ]
         readinessProbe:
           httpGet:
@@ -63,7 +63,7 @@ spec:
           "--backend", "127.0.0.1:8080",
           "--service", "my-api.endpoints.geodis-usapp.cloud.goog",
           "--rollout_strategy", "managed",
-          "--healthz", "health"
+          #"--healthz", "health" # Uncomment if using ESP health check
         ]
         readinessProbe:
           httpGet:
